@@ -32,12 +32,6 @@
   <link rel="stylesheet" href="../assets/vendors/nprogress/nprogress.css">
   <link rel="stylesheet" href="../assets/css/admin.css">
   <script src="../assets/vendors/nprogress/nprogress.js"></script>
-
-  <style>
-    td{
-      max-width: 400px;
-    }
-  </style>
 </head>
 
 <body>
@@ -68,9 +62,9 @@
       <div class="page-action">
         <!-- show when multiple checked -->
         <div class="btn-batch" style="display: none">
-          <button class="btn btn-info btn-sm" onclick="batch('approved')" >批量批准</button>
-          <button class="btn btn-warning btn-sm" onclick="batch('rejected')">批量拒绝</button>
-          <button class="btn btn-danger btn-sm" onclick="batch('trashed')">批量删除</button>
+          <button class="btn btn-info btn-sm">批量批准</button>
+          <button class="btn btn-warning btn-sm">批量拒绝</button>
+          <button class="btn btn-danger btn-sm">批量删除</button>
         </div>
         <ul class="pagination pagination-sm pull-right">
           <li>
@@ -178,15 +172,15 @@
 <!-- 创建表格数据的模板 -->
 <script type="text/html" id="tplComment">
 
-  {{ each list value}}   
-         <!-- list是得到响应体中所有的值  value是每一条数据 -->
+  {{ each list value}}
+
     {{ if value.status == "held" }}
       <tr class="danger">
     {{ else }}
       <tr>
     {{/if}}
-                                                <!-- 这里的id是跟 -->
-        <td class="text-center"><input value="{{ value.id }}" type="checkbox" onclick="doChecked();"></td>
+
+        <td class="text-center"><input type="checkbox" onclick="doChecked();" ></td>
         <td>{{ value.author }}</td>
         <td>{{ value.content }}</td>
         <td>《{{ value.title }}》</td>
@@ -203,14 +197,13 @@
         
           <!-- 如果是approved(已批准)就显示拒绝，如果是held（待审核）,那么就显示批准 -->
         {{ if value.status == "approved" }}
-          <a href="javascript:oprComments({{ value.id }},'rejected');" class="btn btn-warning btn-xs">拒绝</a>
-
+          <a href="post-add.html" class="btn btn-warning btn-xs">拒绝</a>
         {{ else if value.status == "held" }}
-          <a href="javascript:oprComments({{ value.id }},'approved');" class="btn btn-info btn-xs">批准</a>
+          <a href="post-add.html" class="btn btn-info btn-xs">批准</a>
           <!-- 要么就是没有 -->
         {{ /if }}
 
-          <a href="javascript:oprComments({{ value.id }},'trashed');" class="btn btn-danger btn-xs">删除</a>
+          <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
         </td>
     </tr>
 
@@ -252,21 +245,11 @@
 
 <script>
 
-  //声明一个记录当前页索引的全局变量
-  var globalPage = 1;
-
-  //声明一个记录总页数的全局变量
-  var totalPage;
-
   /**
     接收一个参数：pageIndex，这是外界传入一个页码
     传的页码是几，就去找第几页的数据
   */
-  // 声明一个函数 然后给遍历生成的tr调用  不能直接注册事件 
   function loadData(pageIndex) {
-
-    //把全局变量记录一下当前页
-    globalPage = pageIndex;
 
     //发起一个请求
     $.get({
@@ -286,156 +269,52 @@
         //读取页码模板,把总页数传给模板
         //totalPage：代表总页数
         //pageIndex：代表当前页
-        var html2 = template('tplPage', { totalPage: obj.totalPage, pageIndex:pageIndex });
+        var html2 = template('tplPage', { totalPage: obj.totalPage, pageIndex: pageIndex });
         //加在显示页码的ul里面
         $('.pagination').html(html2);
-
-        //记录一下总页数
-        totalPage = obj.totalPage;
       }
     })
   }
-//这里调用第一页是因为浏览器打开默认是在第一页的.
+
   loadData(1);
 
 
-  // 当点击tbody下面的checkbox触发的事件
-  function doChecked(){
+  function doChecked() {
 
+    //判断被选中的checkbox数量是否大于0，大于0就显示，否则隐藏
+    if ($('tbody :checked').length > 0)
+      $('.btn-batch').fadeIn();
+    else
+      $('.btn-batch').fadeOut();
 
-      //判断tbody下面的checkbox被选中的数量是否大于0，大于就代表有被选中的
-      //那么就让批量操作界面显示出来，否则不显示
-      if( $('tbody :checked').length > 0 ){
-
-        //显示出来
-        $('.btn-batch').fadeIn();
-
-      }else{
-
-        //隐藏起来
-        $('.btn-batch').fadeOut();
-      }
     
+    // if( $('tbody :checked').length == $('tbody :checkbox').length ){
+
+    //   $('thead :checkbox').prop('checked',true);
+    // }else{
       
-      //判断选中数量是否等于总数量，如果等于总数量，就要让全选勾上，如果不等于就要去掉
-      /*
-      if( $('tbody :checked').length == $('tbody :checkbox').length ){
+    //   $('thead :checkbox').prop('checked',false);
+    // }
 
-          $('thead :checkbox').prop('checked',true);
+    var res =  $('tbody :checked').length == $('tbody :checkbox').length ;
 
-      }else{
-
-          $('thead :checkbox').prop('checked',false);
-      }
-      */
-
-
-      //结果是true，就给全选true，结果是false就给全选false
-      var res =  $('tbody :checked').length == $('tbody :checkbox').length;
-
-      $('thead :checkbox').prop('checked',res);
+    $('thead :checkbox').prop('checked',res);
 
   }
 
 
-  //表头中的全选那个复选框的点击事件
-  $('thead :checkbox').click(function(){
+  //直接绑定事件
+  $('thead :checkbox').click(function () {
 
-      //如果全选的属性是true，那么tbody下面所有的checkbox也为true
-      var result = $(this).prop('checked');
+    //如果是true，tbody下面也要是true
+    var result = $(this).prop('checked');
 
-      //如果为fasle，那么tbody下面所有的checkbox也为false
-      $('tbody :checkbox').prop( 'checked',result );
+    $('tbody :checkbox').prop('checked', result);
 
-
-      //result获取的是全选框的那个选中值，如果为true，代表选中了，选中了就应该让批量操作显示出来
-      //否则就让它隐藏
-      if(result){  
-        //显示出来
-        $('.btn-batch').fadeIn();
-      }else{
-        //显示出来
-        $('.btn-batch').fadeOut();
-      }
+    if (result)
+      $('.btn-batch').fadeIn();
+    else
+      $('.btn-batch').fadeOut();
   })
-
-  //操作评论数据状态的函数
-  function oprComments(id,status){
-
-    //发请求
-    $.post(
-      {
-        url:"api/updateComments.php",
-        data:{ ids: id ,status:status },
-        success:function(obj){
-
-            if(obj == "ok"){
-
-              //成功,应该传入当前页
-              loadData(globalPage);
-
-            }else{
-
-              alert('操作失败');
-            }
-        }
-      }
-    );
-    
-  }  
-
-
-  function batch(status){
-
-    //如何获取到选中的那些id
-    //1.先去每个checkbox下面，给它们一个value属性，值就是它们的id
-    //2.获取到每个被选中的多选框，并且遍历它们，它们中的value值就是我们要的id
-    //多个id,逗号隔开 例： 3,4,5
-    
-    //准备拼接id的变量
-    var ids = "";
-    $('tbody :checked').each(function(index,ele){
-
-      ids += ele.value + ",";
-      
-    });
-    
-    //因为最后一个id会多一个逗号，所以要把最后一个截取掉（相当于就是比原来长度少1个）
-    //参数1：从哪个索引开始截取
-    //参数2：截取几个长度
-    ids =  ids.substr(0,ids.length - 1);
-
-    //去接口请求
-    $.post({
-
-      url:"api/updateComments.php",
-      data:{ ids:ids, status:status },
-      success:function(obj){
-
-          if(obj == "ok"){
-            
-            //去掉全选的选中状态
-            $('thead :checkbox').prop('checked',false);
-            $('.btn-batch').fadeOut();
-            
-            //如果当前页是最后一页而且还要操作状态为删除并且是全部删，才显示上一页去
-            if( globalPage == totalPage && status == "trashed" && ('thead :checked').length == 1){
-
-              loadData(globalPage - 1);
-
-            }else{
-
-              loadData(globalPage);
-            }
-
-          }else{
-
-            alert('操作失败！');
-          }
-      }
-    })
-
-  }
-
 
 </script>

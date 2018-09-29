@@ -1,5 +1,38 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
+  <!-- 
+    这下面的js代码是用来判断是否是登录状态的.
+  一打开网站就应该判断是否登录
+
+ -->
+<script>
+    //要去发请求
+    //最好用原生发，因为你这里要判断是否登录，也可能还没登录，如果用jQuery，那还需要有一个导入的过程，耗流量以及细微的时间
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('get','api/checkLogin.php');
+
+    xhr.send();
+
+// xhr.onreadystatechange=function(){    这个是兼容的写法.
+//   if(xhr.readyState==4&&xhr.status==200){
+
+//   }
+// }
+    xhr.onload = function(){
+
+      if(xhr.responseText != "loginOK"){
+
+        //如果得到的响应体不是loginOK的话则代表没有成功登录,也就是没有session需要跳转到登录页面
+        
+        location = "login.html";
+        return;//返回登录界面,下面的代码就不需要执行了
+      }
+    }
+
+</script>
+
 <head>
   <meta charset="utf-8">
   <title>Dashboard &laquo; Admin</title>
@@ -17,7 +50,8 @@
       <button class="btn btn-default navbar-btn fa fa-bars"></button>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="profile.html"><i class="fa fa-user"></i>个人中心</a></li>
-        <li><a href="login.html"><i class="fa fa-sign-out"></i>退出</a></li>
+        <!-- 登出事件只需要点击登出的时候删除之前存储的session即可 -->
+        <li><a href="api/doLogout.php"><i class="fa fa-sign-out"></i>退出</a></li>
       </ul>
     </nav>
     <div class="container-fluid">
@@ -88,3 +122,41 @@
   <script>NProgress.done()</script>
 </body>
 </html>
+
+
+<script>
+
+    //获取个人信息 发送请求
+    $.get({
+            
+      url:"api/getUserInfo.php",
+      dataType:"json",  //因为这里是要拿到个人的头像和名称显示在页面时用get请求 并且不传参数.
+      success:function(obj){
+          //obj这里的obj响应体拿到的是一个js对象,可以直接点出来属性值添加在页面的属性中
+        $('.avatar').attr('src',obj.avatar);
+        $('.name').html(obj.nickname);
+      }
+    })
+
+
+    //获取网站信息（仪表盘数据）
+    $.get({
+
+      url:"api/getWebInfo.php",
+      dataType:"json",
+      success:function(obj){
+          //  这种一般先打印出来响应体 然后在根据各自对应属性去填充生成
+          //可以用模板直接填充更好
+          $('.list-group-item').eq(0).children("strong").eq(0).html(obj['postsCount']);
+          $('.list-group-item').eq(0).children("strong").eq(1).html(obj['draftedCount']);
+
+          //分类数量
+          $('.list-group-item').eq(1).children("strong").eq(0).html(obj['categoryCount']);
+
+          //评论数量
+          $('.list-group-item').eq(2).children("strong").eq(0).html(obj['commentsCount']);
+          $('.list-group-item').eq(2).children("strong").eq(1).html(obj['heldCount']);
+
+      }
+    })
+</script>

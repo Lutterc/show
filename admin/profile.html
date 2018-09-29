@@ -1,3 +1,32 @@
+<!-- 
+
+  1. 先把当前登录的用户的信息展现到界面上
+        一开始就发起一个请求，获取到数据，再展示到界面
+
+  2. 给更新加点击事件
+        2.1 点击事件里，阻止事件默认行为
+        2.2 拿到表单中的所有数据
+        2.3 发送请求
+              成功就重新刷新界面
+              失败就提示修改失败
+        
+  3. 给上传文件做文件预览
+        给上传元素加change事件
+        change事件里把上传的文件做成url给img
+
+
+  4. 后端接口代码那
+        1.拿到所有提交的数据
+        2.要判断文件名是否为空
+            如果为空，那么SQL语句就不要写修改avatar字段的语句
+
+            如果不为空，代表有改头像，那么就要修改avatar这个字段
+
+  5. 更新session
+        修改数据库后，代表数据有改变，也要改变session里保存的用户的信息值
+-->
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -33,8 +62,8 @@
           <label class="col-sm-3 control-label">头像</label>
           <div class="col-sm-6">
             <label class="form-image">
-              <input id="avatar" type="file">
-              <img src="../assets/img/default.png">
+              <input id="avatar" type="file" name="avatar" required>
+              <img id="icon" src="../assets/img/default.png">
               <i class="mask fa fa-upload"></i>
             </label>
           </div>
@@ -63,12 +92,12 @@
         <div class="form-group">
           <label for="bio" class="col-sm-3 control-label">简介</label>
           <div class="col-sm-6">
-            <textarea id="bio" class="form-control" placeholder="Bio" cols="30" rows="6">MAKE IT BETTER!</textarea>
+            <textarea id="bio"  name="bio" class="form-control" placeholder="Bio" cols="30" rows="6">MAKE IT BETTER!</textarea>
           </div>
         </div>
         <div class="form-group">
           <div class="col-sm-offset-3 col-sm-6">
-            <button type="submit" class="btn btn-primary">更新</button>
+            <button id="btnSave" type="submit" class="btn btn-primary">更新</button>
             <a class="btn btn-link" href="password-reset.html">修改密码</a>
           </div>
         </div>
@@ -119,3 +148,64 @@
   <script>NProgress.done()</script>
 </body>
 </html>
+
+<script>
+
+  //1. 要请求数据
+  $.get({
+
+    url:"api/getUserInfo.php",
+    dataType:"json",
+    success:function(obj){
+
+      $('#icon').attr('src',obj.avatar);
+      $('#email').val(obj.email);
+      $('#slug').val(obj.slug);
+      $('#nickname').val(obj.nickname);
+      $('#nickname').val(obj.nickname);
+      $('#bio').val(obj.bio);
+
+    }
+  })
+
+
+  //2. 给更新按钮加点击事件
+  $('#btnSave').click(function(e){
+
+      //2.1 阻止事件默认行为
+      e = e || window.event;
+      e.preventDefault();
+
+      //2.2 拿到界面上的值
+      var fm = new FormData(document.querySelector('form'));
+    
+
+      //2.3 发请求
+      $.post({
+
+        url:"api/updateUserInfo.php",
+        data:fm,
+        contentType:false,
+        processData:false,
+        success:function(obj){
+
+            if(obj == "ok"){
+
+              location.reload();
+            }else{
+
+              alert('修改失败！');
+            }
+        }
+      })
+  });
+
+
+  //3. 给选择文件的元素加change事件  图片预览加载 的代码
+  $('#avatar').change(function(){
+       // 这个是
+      var url = URL.createObjectURL(this.files[0]);
+      $('#icon').attr('src',url);
+  })
+
+</script>

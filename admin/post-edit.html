@@ -1,32 +1,26 @@
 <!-- 
 
-  1.界面初始化
-        1.1 把内容修改成富文本编辑器
-                1.1.1 把原来的textarea删掉或隐藏
-                1.1.2 写个div放在原来的位置，再把这个div做成富文本（富文本的基本使用的那几个方法）
+  步骤：
+      1.因为修改界面和新增界面时一毛一样的，所以我们直接复制新增文章的界面，用来做修改的界面
+      2.之前找到时间元素、读取出所有分类显示到界面、创建富文本、给上传加值改变事件，值改变事件里显示预览图片，这些东西，修改界面也要用，所以把它们都留着
+      3.保存的点击事件，先删掉，因为我们到时候写的点击事件是要做修改功能，所以之前新增的点击事件要删掉
+      4.回到posts.html（文章列表页面），修改模板里的“编辑”的href属性，让它们跳到修改界面，并且要带入那一行数据的id
 
-        1.2 给图片加change事件（为了能够预览上传的图片）
-              1.2.1  事件里面拿到this.files[0] 就是我们上传的图片
-              1.2.2  用URL.createObjectURL(传入图片)会生成一个临时的本地的url
-              1.2.3  把这个url作为img的src属性，就能预览了
+      5.取到id，根据id查询出这篇文章的内容，再展示到界面上
+          5.1 先得到location.href，然后用split按=分割成数组
+              数组的下标1就是我们要的id
 
-              （方案二：写一个上传你文件的接口，异步上传文件，接口里返回这个图片的路径）
+          5.2 写一个获取文章详情的接口，需要带一个参数id
 
-        1.3 读取出所有分类，然后把数据当做option加到下拉框
-              在这之前先删掉下拉框里默认的option
+          5.3 来到文章修改界面，发起请求，把id传过去，然后把响应体的数据展示到界面上
+                title,content,slug,feature,category,status,created
 
-        1.4 使用moment.js把当前时间展现到时间控件上
+     
+      6.准备修改文章的接口
+            它这个接口参数是跟新增文章的参数一样，但是多一个id
 
-
-  2.准备新增文章的接口
-        用insert语句，然后还需要N个参数
-
-  
-  3.给保存加点击事件
-      3.1 阻止默认实现
-      3.2 请求接口，把数据提交（ajax2.0），如果用jquery请求，那么应该设置两个值 contentType:false, processData:false
-
-      3.3 如果成功，返回文章列表页
+      7.回调界面调用这个接口，传入对应的值
+          但是注意：用formdata,它还需要添加id以及content
 
  -->
 
@@ -165,8 +159,7 @@
     //把id为ediotor的div创建为富文本对象
     var editor = new wangEditor('#editor');
     editor.create();
-    //让显示时间的元素显示为当前时间
-    created.value = moment().format('YYYY-MM-DDTHH:mm');
+
 
     //给上传元素加change事件：预览图片
     $('#feature').change(function(){
@@ -195,61 +188,78 @@
     });
 
 
+    //想办法取到id
+    //用分割就行了，按=分割
+    var arr = location.href.split("=");
+    var id = arr[1];
 
+    //根据id去查这篇文章的数据
+    $.get({
+
+      url:"api/getPostsDetail.php",
+      data:{id: id},
+      dataType:"json",
+      success:function(obj){
+
+          //设置标题
+          $('#title').val(obj.title);
+
+          //设置内容
+          editor.txt.html(obj.content);
+
+          //设置别名
+          $('#slug').val(obj.slug);
+
+          //设置文章图片预览
+          $('#previewPic').attr('src',obj.feature).show();
+
+          //设置文章分类
+          $('#category').val(obj.category_id);
+
+          //设置时间
+          //先把获取到的数据库里保存的时间转换成对应格式的字符串
+          var res = moment(obj.created).format("YYYY-MM-DDTHH:mm");
+          $('#created').val(res);
+
+          //设置状态
+          $('#status').val(obj.status);
+      }
+    });
+    
+    
+    
+    //给保存加点击事件
     $('#btn').click(function(e){
 
-        e = e || window.event;
-        e.preventDefault();
+      e = e || window.event;
+      e.preventDefault();
 
-        //一个一个拿？
-        //传入一个表单，会自动拿到表单里所有带name的数据
-        var fm = new FormData(document.querySelector('form'));
-        //我们把输入内容的地方变成了富文本编辑器，它是一个div，div并不属于表单内的元素
-        //所以不会自动拿到这个div里的值
-        //那么我们自己追加
-        fm.append("content", editor.txt.html());
-      
-      /*
-        var xhr = new XMLHttpRequest();
 
-        xhr.open('post','api/addPosts.php');
+      //formData
+      var fm = new FormData(document.querySelector('form'));
+      fm.append('content',editor.txt.html());
+      //记得加id传过去
+      fm.append('id',id);
 
-        xhr.send(fm);
+      $.post({
+        url:"api/updatePosts.php",
+        data:fm,
+        contentType:false,
+        processData:false,
+        success:function(obj){
 
-        xhr.onload = function(){
+            if(obj == "ok"){
 
-          console.log(xhr.responseText);
-          
+              location = "posts.html";
+
+            }else{
+
+              alert('修改失败！');
+            }
         }
-      */
+      });
 
-        //发起请求
-        //如果用jQuery发请求时，数据传入的是formData对象，要做一些操作，不然会报错
-        //jQuery搭配ajax2.0要多做一些操作
-        $.post({
-          url:"api/addPosts.php",
-          data:fm,
-          // 这个是代表告诉jQuery，禁用自动转换参数的功能
-          processData: false,
-          // 禁用让jQuery设置请求头（代表我们用的还是formData设置的请求头）
-          contentType:false,
-          success:function(obj){
-
-              if(obj == "ok"){
-
-                //成功
-                location = "posts.html";
-
-              }else{
-
-                //失败
-                alert('新增失败，请与管理员联系！');
-              }
-          }
-        })
     })
-
-
 
 
 </script>

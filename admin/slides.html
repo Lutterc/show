@@ -1,5 +1,35 @@
+<!-- 
+
+  1.在页面一打开时就去发起一个获得所有轮播图的请求
+      1.1 记得写一个获得轮播图的接口，接口里直接查options表里面id为10的value字段，取出这个字段里的值，这个值就已经是一个JSON字符串了，直接输出就行了
+
+      1.2 响应成功，拿到响应体，生成tr（写一个模板）
+
+  
+  2.给文件元素加一个change事件
+      事件里异步上传图片
+      并且拿到上传后的图片路径，加到img里面去
+
+  
+  3.给添加写一个点击事件
+      3.1 阻止默认实现
+      3.2 拿到图片地址，拿到文本，拿到连接，组成一个对象
+      3.3 把这个对象加到数组里（ 需要先把页面一打开获得的数组先用全局变量保存一下 ）
+      3.4 把这个数组序列化成JSON字符串
+      3.5 发起请求，把这个字符串当数据提交过去
+
+
+
+新增总体思路：
+      1.必须异步上传图片，并且要拿到图片的路径
+      2.必须在前端里先生成数据库要保存的字符串，然后直接把这段字符串提交到接口，接口写到数据库
+
+-->
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8">
   <title>Slides &laquo; Admin</title>
@@ -9,6 +39,7 @@
   <link rel="stylesheet" href="../assets/css/admin.css">
   <script src="../assets/vendors/nprogress/nprogress.js"></script>
 </head>
+
 <body>
   <script>NProgress.start()</script>
 
@@ -16,8 +47,14 @@
     <nav class="navbar">
       <button class="btn btn-default navbar-btn fa fa-bars"></button>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="profile.html"><i class="fa fa-user"></i>个人中心</a></li>
-        <li><a href="login.html"><i class="fa fa-sign-out"></i>退出</a></li>
+        <li>
+          <a href="profile.html">
+            <i class="fa fa-user"></i>个人中心</a>
+        </li>
+        <li>
+          <a href="login.html">
+            <i class="fa fa-sign-out"></i>退出</a>
+        </li>
       </ul>
     </nav>
     <div class="container-fluid">
@@ -35,7 +72,7 @@
             <div class="form-group">
               <label for="image">图片</label>
               <!-- show when image chose -->
-              <img class="help-block thumbnail" style="display: none">
+              <img id="img" class="help-block thumbnail" style="display: none">
               <input id="image" class="form-control" name="image" type="file">
             </div>
             <div class="form-group">
@@ -47,19 +84,21 @@
               <input id="link" class="form-control" name="link" type="text" placeholder="链接">
             </div>
             <div class="form-group">
-              <button class="btn btn-primary" type="submit">添加</button>
+              <button id="btn" class="btn btn-primary" type="submit">添加</button>
             </div>
           </form>
         </div>
         <div class="col-md-8">
           <div class="page-action">
             <!-- show when multiple checked -->
-            <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+            <a id="del-batch" class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
           </div>
           <table class="table table-striped table-bordered table-hover">
             <thead>
               <tr>
-                <th class="text-center" width="40"><input type="checkbox"></th>
+                <th class="text-center" width="40">
+                  <input type="checkbox">
+                </th>
                 <th class="text-center">图片</th>
                 <th>文本</th>
                 <th>链接</th>
@@ -68,8 +107,12 @@
             </thead>
             <tbody>
               <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td class="text-center"><img class="slide" src="../uploads/slide_1.jpg"></td>
+                <td class="text-center">
+                  <input type="checkbox">
+                </td>
+                <td class="text-center">
+                  <img class="slide" src="../uploads/slide_1.jpg">
+                </td>
                 <td>XIU功能演示</td>
                 <td>#</td>
                 <td class="text-center">
@@ -77,8 +120,12 @@
                 </td>
               </tr>
               <tr>
-                <td class="text-center"><input type="checkbox"></td>
-                <td class="text-center"><img class="slide" src="../uploads/slide_2.jpg"></td>
+                <td class="text-center">
+                  <input type="checkbox">
+                </td>
+                <td class="text-center">
+                  <img class="slide" src="../uploads/slide_2.jpg">
+                </td>
                 <td>XIU功能演示</td>
                 <td>#</td>
                 <td class="text-center">
@@ -99,32 +146,49 @@
     </div>
     <ul class="nav">
       <li>
-        <a href="index.html"><i class="fa fa-dashboard"></i>仪表盘</a>
+        <a href="index.html">
+          <i class="fa fa-dashboard"></i>仪表盘</a>
       </li>
       <li>
         <a href="#menu-posts" class="collapsed" data-toggle="collapse">
-          <i class="fa fa-thumb-tack"></i>文章<i class="fa fa-angle-right"></i>
+          <i class="fa fa-thumb-tack"></i>文章
+          <i class="fa fa-angle-right"></i>
         </a>
         <ul id="menu-posts" class="collapse">
-          <li><a href="posts.html">所有文章</a></li>
-          <li><a href="post-add.html">写文章</a></li>
-          <li><a href="categories.html">分类目录</a></li>
+          <li>
+            <a href="posts.html">所有文章</a>
+          </li>
+          <li>
+            <a href="post-add.html">写文章</a>
+          </li>
+          <li>
+            <a href="categories.html">分类目录</a>
+          </li>
         </ul>
       </li>
       <li>
-        <a href="comments.html"><i class="fa fa-comments"></i>评论</a>
+        <a href="comments.html">
+          <i class="fa fa-comments"></i>评论</a>
       </li>
       <li>
-        <a href="users.html"><i class="fa fa-users"></i>用户</a>
+        <a href="users.html">
+          <i class="fa fa-users"></i>用户</a>
       </li>
       <li class="active">
         <a href="#menu-settings" data-toggle="collapse">
-          <i class="fa fa-cogs"></i>设置<i class="fa fa-angle-right"></i>
+          <i class="fa fa-cogs"></i>设置
+          <i class="fa fa-angle-right"></i>
         </a>
         <ul id="menu-settings" class="collapse in">
-          <li><a href="nav-menus.html">导航菜单</a></li>
-          <li class="active"><a href="slides.html">图片轮播</a></li>
-          <li><a href="settings.html">网站设置</a></li>
+          <li>
+            <a href="nav-menus.html">导航菜单</a>
+          </li>
+          <li class="active">
+            <a href="slides.html">图片轮播</a>
+          </li>
+          <li>
+            <a href="settings.html">网站设置</a>
+          </li>
         </ul>
       </li>
     </ul>
@@ -132,6 +196,227 @@
 
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/assets/vendors/template-web.js"></script>
   <script>NProgress.done()</script>
 </body>
+
 </html>
+
+
+<script type="text/html" id="tpl">
+{{ each list value key}}
+
+  <tr>
+    <td class="text-center"><input value="{{key}}" onclick="doChecked();" type="checkbox"></td>
+    <td class="text-center"><img class="slide" src="{{ value.image }}"></td>
+    <td>{{ value.text }}</td>
+    <td>{{ value.link }}</td>
+    <td class="text-center">
+      <a href="javascript:deleteSlider( {{ key }} );" class="btn btn-danger btn-xs">删除</a>
+    </td>
+  </tr>
+
+{{ /each }}
+</script>
+
+<script>
+
+  //准备一个全局变量保存得到的轮播图数组
+  var list;
+
+  //1.0 页面一打开就加载出所有轮播图数据显示到界面上
+  $.get({
+
+    url: "api/getSlider.php",
+    dataType: "json",
+    success: function (obj) {
+
+      var html = template('tpl', { list: obj });
+      $('tbody').html(html);
+
+      list = obj;
+
+    }
+  })
+
+
+  //2.0 给上传文件元素加change事件，做图片预览 方案一：临时URL  方案二：先异步上传图片到服务器，再从服务器拿到图片的路径返回来
+  $('#image').change(function () {
+
+    // var url = URL.createObjectURL(this.files[0]);
+    // $('#img').attr('src',url).show();
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('post', 'api/uploadPic.php');
+
+    //创建formdata
+    var fm = new FormData(document.querySelector('form'));
+    //有洁癖同学请使用下面代码
+    // fm.delete('text');
+    // fm.delete('link');
+
+    xhr.send(fm);
+
+    xhr.onload = function () {
+
+      $('#img').attr('src', xhr.responseText).show();
+    }
+
+  })
+
+
+  //3.0 给添加按钮加点击事件
+  $('#btn').click(function (e) {
+
+    e = e || window.event;
+    e.preventDefault();
+
+    //拿到界面上的数据
+    //先拿到路径
+    var path = $('#img').attr('src');
+
+    //拿到文本
+    var text = $('#text').val();
+
+    //拿到连接
+    var link = $('#link').val();
+
+    //加到数组里，数组里保存的是对象，所以先把这三个值放到对象里
+    var obj = { image: path, text: text, link: link };
+
+    //添加到数组里
+    list.push(obj);
+
+    //要提交到服务器
+    // console.log(list);
+
+    //下面这个是把JSON字符串转成JS对象
+    // JSON.parse();
+
+    //这个是把JS对象转成JSON字符串
+    var jsonStr = JSON.stringify(list);
+
+    //发请求
+    $.post({
+
+      url: "api/updateSlider.php",
+      data: { value: jsonStr },
+      success: function (obj) {
+
+        if (obj == "ok") {
+
+          location.reload();
+        } else {
+
+          alert('删除失败');
+        }
+      }
+    })
+
+  });
+
+
+  //每行删除的点击事件
+  function deleteSlider(index) {
+
+    //根据下标删除数组元素
+    //数组的删除
+    // list.shift(); //删第一个
+    // list.pop(); //删最后一个
+
+    //而我们现在要的是根据索引删除某个元素
+    //参数1：从下标几开始删
+    //参数2：删几个
+    list.splice(index, 1);
+
+    //把数组转换为json字符串
+    var jsonStr = JSON.stringify(list);
+
+    //再提交到接口
+    //发请求
+    $.post({
+
+      url: "api/updateSlider.php",
+      data: { value: jsonStr },
+      success: function (obj) {
+
+        if (obj == "ok") {
+
+          location.reload();
+        } else {
+
+          alert('新增失败');
+        }
+      }
+    })
+  }
+
+  //给全选加点击事件
+  $('thead :checkbox').click(function(){
+
+    //拿到自己的状态
+    var res = $(this).prop('checked');
+
+    //设置给tbody里的checkbox
+    $('tbody :checkbox').prop('checked',res);
+
+    //如果是全选的状态应该让批量操作显示出来
+    if(res){
+
+         $('#del-batch').fadeIn();
+    }else{
+
+        $('#del-batch').fadeOut();
+    }
+  })
+
+
+  function doChecked(){
+
+      //判断tbody下面选中的数量是否大于0，大于0显示批量删除
+      if($('tbody :checked').length > 0){
+
+          $('#del-batch').fadeIn();
+      }else{
+
+          $('#del-batch').fadeOut();
+      }
+      
+      //tbody下面的选中数量如果等于tbody下面checkbox的总数，就代表全部选中
+      if($('tbody :checked').length == $('tbody :checkbox').length){
+
+        $('thead :checkbox').prop('checked',true);
+      }else{
+
+        $('thead :checkbox').prop('checked',false);
+      }
+  }
+
+
+  //批量删除加点击事件
+  $('#del-batch').click(function(){
+
+    var iList = [];
+
+    //要获取到所有tbody下面被选中的行数
+    $('tbody :checked').each(function(index,ele){
+
+        //ele.value; //有要删除的下标
+        //把下标存到数组中
+        iList.unshift(ele.value);
+        
+    });
+
+    for(var i = 0; i < iList.length; i++){
+
+      list.splice(iList[i],1);
+    }
+
+    //生成json字符串
+
+    //去请求更新的接口
+    
+  })
+
+</script>

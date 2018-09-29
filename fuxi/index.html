@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <input type="checkbox" id="chk1">
+    
+    <div class="box">
+            <input type="checkbox" id="chk2">
+            <input type="checkbox" id="chk3">
+    </div>
+
+    <input type="button" id="btn1" value="点我">
+    <input type="button" id="btn2" value="全选">
+
+</body>
+</html>
+
+
+<script src="/assets/vendors/jquery/jquery.js"></script>
+
+<script>
+
+    $('#btn2').click(function(){
+
+
+        $(':checkbox').prop('checked',true);
+
+    })
+
+
+    $('#btn1').click(function(){
+
+        //找到所有的checkbox
+        // var chkList = $('input[type=checkbox]');
+        // console.log(chkList);
+        
+        //找到当前页面下所有的checkbox
+        // var chkList = $(':checkbox');
+        // console.log(chkList);
+
+        //只找div里的checkbox
+        // var chkList = $('.box :checkbox');
+        // console.log(chkList);
+
+
+        //找到所有被选中的checkbox
+        // var chk =  $(':checked');
+        // console.log(chk);
+        
+        //找到box下面被选中的checkbox
+        var chk =  $('.box :checked');
+        console.log(chk);
+        
+    })
+
+
+    //在if-else语句，或者循环等语句里面，如果大括号里面只有1句代码，那么大括号可以省略
+    if(true)
+
+        console.log('利群是true');
+    else
+
+        console.log('false');
+
+
+    // if(条件) return;
+    
+
+</script>

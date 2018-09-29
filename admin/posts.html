@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8">
   <title>Posts &laquo; Admin</title>
@@ -9,6 +10,7 @@
   <link rel="stylesheet" href="../assets/css/admin.css">
   <script src="../assets/vendors/nprogress/nprogress.js"></script>
 </head>
+
 <body>
   <script>NProgress.start()</script>
 
@@ -16,8 +18,14 @@
     <nav class="navbar">
       <button class="btn btn-default navbar-btn fa fa-bars"></button>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="profile.html"><i class="fa fa-user"></i>个人中心</a></li>
-        <li><a href="login.html"><i class="fa fa-sign-out"></i>退出</a></li>
+        <li>
+          <a href="profile.html">
+            <i class="fa fa-user"></i>个人中心</a>
+        </li>
+        <li>
+          <a href="login.html">
+            <i class="fa fa-sign-out"></i>退出</a>
+        </li>
       </ul>
     </nav>
     <div class="container-fluid">
@@ -31,31 +39,44 @@
       </div> -->
       <div class="page-action">
         <!-- show when multiple checked -->
-        <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+        <a id="batch-del" class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+
         <form class="form-inline">
-          <select name="" class="form-control input-sm">
+          <select id="cate" name="" class="form-control input-sm">
             <option value="">所有分类</option>
-            <option value="">未分类</option>
           </select>
-          <select name="" class="form-control input-sm">
+          <select id="selStatus" name="" class="form-control input-sm">
             <option value="">所有状态</option>
-            <option value="">草稿</option>
-            <option value="">已发布</option>
+            <option value="drafted">草稿</option>
+            <option value="published">已发布</option>
           </select>
-          <button class="btn btn-default btn-sm">筛选</button>
+          <!-- 如果双标签button在表单里面，那么它默认就有一个点击事件，就是提交（也就是相当于它默认成了submit） -->
+          <button id="btnFilter" class="btn btn-default btn-sm">筛选</button>
         </form>
         <ul class="pagination pagination-sm pull-right">
-          <li><a href="#">上一页</a></li>
-          <li><a href="#">1</a></li>
-          <li><a href="#">2</a></li>
-          <li><a href="#">3</a></li>
-          <li><a href="#">下一页</a></li>
+          <li>
+            <a href="#">上一页</a>
+          </li>
+          <li>
+            <a href="#">1</a>
+          </li>
+          <li>
+            <a href="#">2</a>
+          </li>
+          <li>
+            <a href="#">3</a>
+          </li>
+          <li>
+            <a href="#">下一页</a>
+          </li>
         </ul>
       </div>
       <table class="table table-striped table-bordered table-hover">
         <thead>
           <tr>
-            <th class="text-center" width="40"><input type="checkbox"></th>
+            <th class="text-center" width="40">
+              <input type="checkbox">
+            </th>
             <th>标题</th>
             <th>作者</th>
             <th>分类</th>
@@ -66,7 +87,9 @@
         </thead>
         <tbody>
           <tr>
-            <td class="text-center"><input type="checkbox"></td>
+            <td class="text-center">
+              <input type="checkbox">
+            </td>
             <td>随便一个名称</td>
             <td>小小</td>
             <td>潮科技</td>
@@ -78,7 +101,9 @@
             </td>
           </tr>
           <tr>
-            <td class="text-center"><input type="checkbox"></td>
+            <td class="text-center">
+              <input type="checkbox">
+            </td>
             <td>随便一个名称</td>
             <td>小小</td>
             <td>潮科技</td>
@@ -90,7 +115,9 @@
             </td>
           </tr>
           <tr>
-            <td class="text-center"><input type="checkbox"></td>
+            <td class="text-center">
+              <input type="checkbox">
+            </td>
             <td>随便一个名称</td>
             <td>小小</td>
             <td>潮科技</td>
@@ -98,7 +125,7 @@
             <td class="text-center">已发布</td>
             <td class="text-center">
               <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-              <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+              <a href="javascript:" class="btn btn-danger btn-xs">删除</a>
             </td>
           </tr>
         </tbody>
@@ -113,32 +140,49 @@
     </div>
     <ul class="nav">
       <li>
-        <a href="index.html"><i class="fa fa-dashboard"></i>仪表盘</a>
+        <a href="index.html">
+          <i class="fa fa-dashboard"></i>仪表盘</a>
       </li>
       <li class="active">
         <a href="#menu-posts" data-toggle="collapse">
-          <i class="fa fa-thumb-tack"></i>文章<i class="fa fa-angle-right"></i>
+          <i class="fa fa-thumb-tack"></i>文章
+          <i class="fa fa-angle-right"></i>
         </a>
         <ul id="menu-posts" class="collapse in">
-          <li class="active"><a href="posts.html">所有文章</a></li>
-          <li><a href="post-add.html">写文章</a></li>
-          <li><a href="categories.html">分类目录</a></li>
+          <li class="active">
+            <a href="posts.html">所有文章</a>
+          </li>
+          <li>
+            <a href="post-add.html">写文章</a>
+          </li>
+          <li>
+            <a href="categories.html">分类目录</a>
+          </li>
         </ul>
       </li>
       <li>
-        <a href="comments.html"><i class="fa fa-comments"></i>评论</a>
+        <a href="comments.html">
+          <i class="fa fa-comments"></i>评论</a>
       </li>
       <li>
-        <a href="users.html"><i class="fa fa-users"></i>用户</a>
+        <a href="users.html">
+          <i class="fa fa-users"></i>用户</a>
       </li>
       <li>
         <a href="#menu-settings" class="collapsed" data-toggle="collapse">
-          <i class="fa fa-cogs"></i>设置<i class="fa fa-angle-right"></i>
+          <i class="fa fa-cogs"></i>设置
+          <i class="fa fa-angle-right"></i>
         </a>
         <ul id="menu-settings" class="collapse">
-          <li><a href="nav-menus.html">导航菜单</a></li>
-          <li><a href="slides.html">图片轮播</a></li>
-          <li><a href="settings.html">网站设置</a></li>
+          <li>
+            <a href="nav-menus.html">导航菜单</a>
+          </li>
+          <li>
+            <a href="slides.html">图片轮播</a>
+          </li>
+          <li>
+            <a href="settings.html">网站设置</a>
+          </li>
         </ul>
       </li>
     </ul>
@@ -146,6 +190,280 @@
 
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/assets/vendors/template-web.js"></script>
   <script>NProgress.done()</script>
 </body>
+
 </html>
+
+<script type="text/html" id="tplPosts">
+
+{{each list value}}
+
+  <tr>
+      <td class="text-center"><input value="{{ value.id }}" type="checkbox" onclick="doCheck();"></td>
+      <td>{{ value.title }}</td>
+      <td>{{ value.nickname }}</td>
+      <td> {{ value.name }} </td>
+
+      <td class="text-center">{{ value.created }}</td>
+      {{ if value.status == "published" }}
+        <td class="text-center">已发布</td>
+      {{ else if value.status == "drafted" }}
+        <td class="text-center">草稿</td>
+      {{ /if }}
+
+      <td class="text-center">
+        <a href="post-edit.html?id={{ value.id }}" class="btn btn-default btn-xs">编辑</a>
+        <a href="javascript:doDelete({{ value.id }});" class="btn btn-danger btn-xs">删除</a>
+      </td>
+  </tr>
+
+{{ /each }}
+</script>
+
+
+<script type="text/html" id="tplPage">
+
+  <li><a href="#">上一页</a></li>
+
+<% for(var i = 1; i <= totalPage; i++){ %>
+
+  {{ if i == currentPage }}
+  <li class="active"><a href="javascript:loadData({{i}})">{{i}}</a></li>
+  {{ else }}
+  <li><a href="javascript:loadData({{i}})">{{i}}</a></li>
+  {{ /if }}
+
+<% } %>
+  <li><a href="#">下一页</a></li>
+</script>
+
+
+<script src="/assets/vendors/twbs-pagination/jquery.twbsPagination.min.js"></script>
+
+
+<script>
+
+  var globalPage;
+
+  /*
+    一般框架名字前面带jquery的，代表这个框架是基于jQuery开发出来的框架
+    基于jQuery的意思就是说，这个框架里面的源码就是用jQuery写的
+    如果用这种基于jQuery的框架，那必须先导入jQuery，然后再导入这个框架
+
+  */
+
+  //根据页码加载数据的函数
+  function loadData(pageIndex, cate_id, status) {
+
+    globalPage = pageIndex;
+
+    $.get({
+
+      url: "api/getposts.php",
+      data: { pageIndex: pageIndex, pageSize: 10, cate_id: cate_id, status: status },
+      dataType: 'json',
+      success: function (obj) {
+
+        //根据模板生成tr
+        var html = template('tplPosts', { list: obj.data });
+        //加到tbody里面
+        $('tbody').html(html);
+
+        //先清空上一次的分页数据
+        $('.pagination').twbsPagination("destroy");
+
+        //重新生成
+        $('.pagination').twbsPagination({
+
+          //总页数
+          totalPages: obj.totalPage,
+          //当前页
+          startPage: globalPage,
+          //上一页
+          prev: "上一页",
+          //下一页
+          next: "下一页",
+          //首页
+          first: "首页",
+          //尾页
+          last: "尾页",
+          //禁用第一次自动调用点击事件
+          initiateStartPageClick: false,
+          //点击事件
+          onPageClick: function (event, page) {
+
+            //获取当前的分类
+            var cate_id = $('#cate').val();
+            //获取当前的状态
+            var status = $('#selStatus').val();
+
+            //点击后要去加载新的数据
+            loadData(page, cate_id, status);
+
+          }
+        });
+
+      }
+    })
+  }
+
+  //页面一打开就去请求默认数据
+  loadData(1, "", "");
+
+
+
+  //读取出所有的分类数据
+  //注意：需要先去select给它加一个id，并且删掉里面默认的“未分类”，注意“保留所有分类”
+  $.get({
+    url: "api/getCategory.php",
+    dataType: "json",
+    success: function (obj) {
+
+      //一般复杂的结构用模板
+      for (var i = 0; i < obj.length; i++) {
+
+        //创建option
+        var opt = document.createElement('option');
+        opt.innerHTML = obj[i].name;
+        //把分类id存到这个option的value里
+        opt.value = obj[i].id;
+        //加到select里面
+        $('#cate').append(opt);
+      }
+
+    }
+  })
+
+
+  //筛选按钮的点击事件
+  $('#btnFilter').click(function (e) {
+
+    //阻止默认实现
+    e = e || window.event;
+    e.preventDefault();
+
+    //获取选中的状态
+    var cate_id = $('#cate').val();
+    var status = $('#selStatus').val();
+
+
+    //我们现在想发一下格式的请求
+    // api/getPosts
+    // 传递四个参数
+    // 响应体就是返回的json数据
+    // 拿到响应体就要生成模板html，渲染到界面上，而且还要生成页码
+    // 刚好发现loadData这个函数就做了上面这些事，只不过loadData里面cate_id和status写死了空
+    // 为了让这个函数扩展性更强，所以把这两个值当做参数传进来
+
+    loadData(1, cate_id, status);
+
+  })
+
+
+  function doDelete(id) {
+
+    $.get({
+
+      url: "api/deletePosts.php",
+      data: { ids: id },
+      success: function (obj) {
+
+        if (obj == "ok") {
+
+          //取出当前的分类状态
+          var cate_id = $('#cate').val();
+          //取出当前的状态
+          var status = $('#selStatus').val();
+
+          //记录当前页
+          loadData(globalPage, cate_id, status);
+
+        } else {
+
+          alert("删除失败");
+        }
+      }
+    })
+
+  }
+
+
+  //给全选加一个点击事件
+  $('thead :checkbox').click(function () {
+
+    //先到自己的状态，自己选中，下面也都选中
+    var res = $(this).prop('checked');
+
+    $('tbody :checkbox').prop('checked', res);
+
+    if (res) {
+
+      $('#batch-del').fadeIn();
+    }
+  })
+
+
+  //tbody中多选框的点击事件
+  function doCheck() {
+
+    //判断下面数量是否大于0，大于0则显示批量界面
+    if ($('tbody :checked').length > 0) {
+
+      $('#batch-del').fadeIn();
+    } else {
+
+      $('#batch-del').fadeOut();
+    }
+
+
+    if ($('tbody :checked').length == $('tbody :checkbox').length) {
+
+      $('thead :checkbox').prop('checked', true);
+    } else {
+
+      $('thead :checkbox').prop('checked', false);
+    }
+  }
+
+
+  //批量删除的点击事件
+  $('#batch-del').click(function () {
+
+    //遍历所有被选中的checkbox，取到他们的id，拼接起来
+    var ids = "";
+
+    $('tbody :checked').each(function (index, ele) {
+
+      ids += ele.value + ",";
+    })
+
+    ids = ids.substr(0, ids.length - 1);
+
+
+    $.get({
+
+      url: "api/deletePosts.php",
+      data: { ids: ids },
+      success: function (obj) {
+
+        if (obj == "ok") {
+
+          //取出当前的分类状态
+          var cate_id = $('#cate').val();
+          //取出当前的状态
+          var status = $('#selStatus').val();
+
+          //记录当前页
+          loadData(globalPage, cate_id, status);
+
+        } else {
+
+          alert('删除失败');
+        }
+      }
+    })
+  })
+
+</script>

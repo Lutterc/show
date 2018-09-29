@@ -1,3 +1,26 @@
+<?php 
+
+  //接收传过来的分类id
+  $cateId = $_GET['cateId'];
+
+  //接收传过来的分类名
+  $name = $_GET['name'];
+
+  //查出此分类下的5条最新数据
+  $sql = "select p.id,p.title,u.slug,p.created,p.content,p.views,p.likes from posts p 
+  inner join users u
+  on p.user_id = u.id
+where p.category_id = $cateId and p.status = 'published'
+order by p.id desc limit 5";
+
+include "admin/api/tools/doSql.php";
+
+$data = doSelect($sql);
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -180,52 +203,35 @@
       </div>
     </div>
     <div class="content">
-      <div class="article">
-        <div class="breadcrumb">
-          <dl>
-            <dt>当前位置：</dt>
-            <dd><a href="javascript:;">奇趣事</a></dd>
-            <dd>变废为宝！将手机旧电池变为充电宝的Better RE移动电源</dd>
-          </dl>
-        </div>
-        <h2 class="title">
-          <a href="javascript:;">又现酒窝夹笔盖新技能 城里人是不让人活了！</a>
-        </h2>
-        <div class="meta">
-          <span>DUX主题小秘 发布于 2015-06-29</span>
-          <span>分类: <a href="javascript:;">奇趣事</a></span>
-          <span>阅读: (2421)</span>
-          <span>评论: (143)</span>
-        </div>
-      </div>
-      <div class="panel hots">
-        <h3>热门推荐</h3>
-        <ul>
-          <li>
-            <a href="javascript:;">
+      <div class="panel new">
+        <h3><?php echo $name; ?></h3>
+      
+      <?php foreach($data as $value): ?>
+
+        <div class="entry">
+          <div class="head">
+            <a href="detail.php?id=<?php echo $value['id']; ?>"><?php echo $value['title']; ?></a>
+          </div>
+          <div class="main">
+            <p class="info"><?php echo $value['slug']; ?> 发表于 <?php echo $value['created']; ?></p>
+            <p class="brief"><?php echo $value['content']; ?></p>
+            <p class="extra">
+              <span class="reading">阅读(<?php echo $value['views']; ?>)</span>
+              <span class="comment">评论(0)</span>
+              <a href="javascript:;" class="like">
+                <i class="fa fa-thumbs-up"></i>
+                <span>赞(<?php echo $value['likes']; ?>)</span>
+              </a>
+              <a href="javascript:;" class="tags">
+                分类：<span><?php echo $name; ?></span>
+              </a>
+            </p>
+            <a href="javascript:;" class="thumb">
               <img src="uploads/hots_2.jpg" alt="">
-              <span>星球大战:原力觉醒视频演示 电影票68</span>
             </a>
-          </li>
-          <li>
-            <a href="javascript:;">
-              <img src="uploads/hots_3.jpg" alt="">
-              <span>你敢骑吗？全球第一辆全功能3D打印摩托车亮相</span>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:;">
-              <img src="uploads/hots_4.jpg" alt="">
-              <span>又现酒窝夹笔盖新技能 城里人是不让人活了！</span>
-            </a>
-          </li>
-          <li>
-            <a href="javascript:;">
-              <img src="uploads/hots_5.jpg" alt="">
-              <span>实在太邪恶！照亮妹纸绝对领域与私处</span>
-            </a>
-          </li>
-        </ul>
+          </div>
+        </div>
+<?php endforeach; ?>
       </div>
     </div>
     <div class="footer">

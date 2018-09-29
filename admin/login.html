@@ -11,9 +11,9 @@
     <form class="login-wrap">
       <img class="avatar" src="../assets/img/default.png">
       <!-- 有错误信息时展示 -->
-      <!-- <div class="alert alert-danger">
+      <div class="alert alert-danger" style="display: none;">
         <strong>错误！</strong> 用户名或密码错误！
-      </div> -->
+      </div>
       <div class="form-group">
         <label for="email" class="sr-only">邮箱</label>
         <input id="email" type="email" class="form-control" placeholder="邮箱" autofocus>
@@ -27,3 +27,35 @@
   </div>
 </body>
 </html>
+
+<script src="/assets/vendors/jquery/jquery.js"></script>
+
+<script>
+
+    $('.btn').click(function(e){
+
+        e = e || window.event;
+        // 阻止事件的默认实现
+        e.preventDefault();
+
+        //发请求
+        $.post({
+
+          url:"api/doLogin.php",
+          //这里表示将输入的email值通过email传到php文件中去.
+          data:{ email:$('#email').val() ,password:$('#password').val() },
+          dataType:"json",  //表示php文件返回的值json字符串,转换成js对象
+          success:function(obj){
+                  //得到的响应体是ok表示登录成功
+              if(obj.status == "ok"){
+
+                //登录成功！跳转到主页
+                location = "index.html";
+              }else{
+                    //这里的弹出登录成功的字样
+                $('.alert').fadeIn(800).fadeOut(800);
+              }
+          }
+        })
+    })
+</script>
